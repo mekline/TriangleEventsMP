@@ -97,54 +97,6 @@ for i=1:1
     fixPath = trial(3);
     fixAgent = trial(4);
     
-    %
-    %Make an A (agent-same) block
-    %
-    %(same again)
-    
-    %Get an initial choice (j)
-    while j==0
-        j = datasample(used, 1);
-        trial = myset(j,:);
-        if isequal(trial(4), fixAgent)
-            j=0;
-        end
-    end
-    
-    %Now find 3 that share j's agent but nothing else.
-    MBanList = trial(2);
-    PBanList = trial(3);
-    AtoFind = trial(4);
-    found = j;
-    iter = 1;
-    while (length(found) < 4)
-        testfit = myset(iter,:);
-        
-        %Does it match? Must be: unused, not already on any ban lists for
-        %this block
-        if not(used(iter) == 0)
-            if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && ismember(testfit(4), AtoFind) 
-                found(end+1) = iter;
-                used(iter) = 0;
-                MBanList(1,end+1) = testfit(2);
-                PBanList(1,end+1) = testfit(3);
-            end
-        end
-        %keep looking!
-        iter = iter+1;
-    end
-    
-    %Add A block to myblocks
-    for k=1:4 
-        trial = myset(found(k),:);
-        trial{1,8} = 'A';
-        wheretoput = (i-1)*24 + 4 + k; % 13:16 on iteration 1, 37:40 on iteration 2
-        myblocks(wheretoput,:) = trial(:);
-    end
-    
-    MBanList
-    PBanList
-    AtoFind
     
     %
     %Make an M (manner-same) block
@@ -187,13 +139,10 @@ for i=1:1
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'M';
-        wheretoput = (i-1)*24 + 8 + k; % 5:8 on iteration 1, 29:32 on iteration 2
+        wheretoput = (i-1)*24 + 4 + k; % 5:8 on iteration 1, 29:32 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
-    
-    MtoFind
-    PBanList
-    ABanList
+
     
     %            
     %Make a P (path-same) block
@@ -238,13 +187,55 @@ for i=1:1
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'P';
-        wheretoput = (i-1)*24 + 12 + k; % 9:12 on iteration 1, 33:36 on iteration 2
+        wheretoput = (i-1)*24 + 8 + k; % 9:12 on iteration 1, 33:36 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
+
+    %
+    %Make an A (agent-same) block
+    %
+    %
     
-    MBanList
-    PtoFind
-    ABanList
+    %Get an initial choice (j)
+    j=0;
+    while j==0
+        j = datasample(used, 1);
+        trial = myset(j,:);
+        if isequal(trial(4), fixAgent)
+            j=0;
+        end
+    end
+    
+    %Now find 3 that share j's agent but nothing else.
+    MBanList = trial(2);
+    PBanList = trial(3);
+    AtoFind = trial(4);
+    found = j;
+    iter = 1;
+    while (length(found) < 4)
+        testfit = myset(iter,:);
+        
+        %Does it match? Must be: unused, not already on any ban lists for
+        %this block
+        if not(used(iter) == 0)
+            if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && ismember(testfit(4), AtoFind) 
+                found(end+1) = iter;
+                used(iter) = 0;
+                MBanList(1,end+1) = testfit(2);
+                PBanList(1,end+1) = testfit(3);
+            end
+        end
+        %keep looking!
+        iter = iter+1;
+    end
+    
+    %Add A block to myblocks
+    for k=1:4 
+        trial = myset(found(k),:);
+        trial{1,8} = 'A';
+        wheretoput = (i-1)*24 + 12 + k; % 13:16 on iteration 1, 37:40 on iteration 2
+        myblocks(wheretoput,:) = trial(:);
+    end
     
     
     %
@@ -287,15 +278,15 @@ for i=1:1
         myblocks(wheretoput,:) = trial(:);
     end
     
-    MBanList
-    PBanList
-    ABanList
+    %MBanList
+    %PBanList
+    %ABanList
     
 
     
 end
 
-myblocks(1:24, 2:4)
+myblocks(1:24, [2 3 4 8])
 
 for i=1:2 %control blocks!
 end
