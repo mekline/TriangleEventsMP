@@ -73,13 +73,18 @@ end
 %Make a place to hold the rows of each block, plus block kind
 myblocks = cell(48,8);
 
-for i=1:2 
+for i=1:2
     myset = mysets{i};
     used = 1:64; %64 available 'real' event movies/subset, used for indexing into the arrays.  Set to 0 when used.
     
-    %
+    %The plan is to try to pick items from that (un) used set to satisfy
+    %all the block requirements. Since this proceeds by randoml
+    %%%%%
     %Make an S (all-same) block
-    %
+    %%%%%%
+    
+    
+    %Get an initial choice (j), and reuse it!
     j = datasample(used, 1);
     used(j) = 0;
     trial = myset(j,:);
@@ -94,9 +99,12 @@ for i=1:2
     fixPath = trial(3);
     fixAgent = trial(4);
     
-    %
+    
+    %%%%%%
     %Make an M (manner-same) block
-    %
+    %%%%%%
+    
+    %Get an initial choice (j)
     j=0;
     while j==0
         j = datasample(used, 1);
@@ -111,16 +119,22 @@ for i=1:2
     PBanList = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(iterator(iter) == 0)
             if ismember(testfit(2),MtoFind) && not(ismember(testfit(3), PBanList)) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 PBanList(1,end+1) = testfit(3);
                 ABanList(1,end+1) = testfit(4);
             end
@@ -133,17 +147,18 @@ for i=1:2
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'M';
-        wheretoput = (i-1)*24 + 4 + k % 5:8 on iteration 1, 29:32 on iteration 2
+        wheretoput = (i-1)*24 + 4 + k; % 5:8 on iteration 1, 29:32 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
-    
 
     
-    %            
+    %%%%%            
     %Make a P (path-same) block
     %
     %(ugly code! this is just the mannerblock code modified slightly!)
-    %
+    %%%%%
+    
+    %Get an initial choice (j)
     j=0;
     while j==0
         j = datasample(used, 1);
@@ -158,16 +173,23 @@ for i=1:2
     PtoFind = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && ismember(testfit(3), PtoFind) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 ABanList(1,end+1) = testfit(4);
             end
@@ -180,16 +202,17 @@ for i=1:2
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'P';
-        wheretoput = (i-1)*24 + 8 + k % 9:12 on iteration 1, 33:36 on iteration 2
+        wheretoput = (i-1)*24 + 8 + k; % 9:12 on iteration 1, 33:36 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
-    
-    
+
     %
     %Make an A (agent-same) block
     %
-    %(same again)
+    %
     
+    %Get an initial choice (j)
+    j=0;
     while j==0
         j = datasample(used, 1);
         trial = myset(j,:);
@@ -197,21 +220,28 @@ for i=1:2
             j=0;
         end
     end
+    
     %Now find 3 that share j's agent but nothing else.
     MBanList = trial(2);
     PBanList = trial(3);
     AtoFind = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && ismember(testfit(4), AtoFind) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 PBanList(1,end+1) = testfit(3);
             end
@@ -224,14 +254,14 @@ for i=1:2
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'A';
-        wheretoput = (i-1)*24 + 12 + k % 13:16 on iteration 1, 37:40 on iteration 2
+        wheretoput = (i-1)*24 + 12 + k; % 13:16 on iteration 1, 37:40 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
+    
     
     %
     %Make an D (all-diff) block 
     %
-    
     j=0;
     while j==0
         j = datasample(used, 1);
@@ -242,16 +272,22 @@ for i=1:2
     PBanList = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 PBanList(1,end+1) = testfit(3);
                 ABanList(1,end+1) = testfit(4);
@@ -265,7 +301,7 @@ for i=1:2
     for k=1:4 
         trial = myset(found(k),:);
         trial{1,8} = 'D';
-        wheretoput = (i-1)*24 + 16 + k % 17:20 on iteration 1, 41:44 on iteration 2
+        wheretoput = (i-1)*24 + 16 + k; % 17:20 on iteration 1, 41:44 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
     
@@ -273,7 +309,7 @@ for i=1:2
     
 end
 
-myblocks;
+myblocks(1:24, [2 3 4 8])
 
 for i=1:2 %control blocks!
 end

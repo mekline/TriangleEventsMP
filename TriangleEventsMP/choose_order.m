@@ -37,7 +37,7 @@ function [info stimFiles fname] = choose_order(subj,run,counter,stimFolder)
 % open materials file
 [num,txt,raw] = xlsread('materials.xls');
 
-%dummy output args, don't worry about them!
+%dummy output args, fix these up later!
 info=1;
 stimFiles=1;
 fname = 1;
@@ -73,13 +73,18 @@ end
 %Make a place to hold the rows of each block, plus block kind
 myblocks = cell(48,8);
 
-for i=1:1 
+for i=1:2
     myset = mysets{i};
     used = 1:64; %64 available 'real' event movies/subset, used for indexing into the arrays.  Set to 0 when used.
     
-    %
+    %The plan is to try to pick items from that (un) used set to satisfy
+    %all the block requirements. Since this proceeds by randomly picking &
+    %checking items, it will sometimes fail.  Wrap it up in a try block
+    %until we finally succeed!
+    
+    %%%%%
     %Make an S (all-same) block
-    %
+    %%%%%%
     
     
     %Get an initial choice (j), and reuse it!
@@ -98,9 +103,9 @@ for i=1:1
     fixAgent = trial(4);
     
     
-    %
+    %%%%%%
     %Make an M (manner-same) block
-    %
+    %%%%%%
     
     %Get an initial choice (j)
     j=0;
@@ -117,16 +122,22 @@ for i=1:1
     PBanList = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(iterator(iter) == 0)
             if ismember(testfit(2),MtoFind) && not(ismember(testfit(3), PBanList)) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 PBanList(1,end+1) = testfit(3);
                 ABanList(1,end+1) = testfit(4);
             end
@@ -144,11 +155,11 @@ for i=1:1
     end
 
     
-    %            
+    %%%%%            
     %Make a P (path-same) block
     %
     %(ugly code! this is just the mannerblock code modified slightly!)
-    %
+    %%%%%
     
     %Get an initial choice (j)
     j=0;
@@ -165,16 +176,23 @@ for i=1:1
     PtoFind = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && ismember(testfit(3), PtoFind) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 ABanList(1,end+1) = testfit(4);
             end
@@ -211,16 +229,22 @@ for i=1:1
     PBanList = trial(3);
     AtoFind = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && ismember(testfit(4), AtoFind) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 PBanList(1,end+1) = testfit(3);
             end
@@ -251,16 +275,22 @@ for i=1:1
     PBanList = trial(3);
     ABanList = trial(4);
     found = j;
+    
+    %Extra bit so search through the subset won't always start at 1
+    iterator = [1:64]; 
+    r = randi([1 64]);%shift!
+    iterator = iterator([r:64 1:r]);
     iter = 1;
+    
     while (length(found) < 4)
-        testfit = myset(iter,:);
+        testfit = myset(iterator(iter),:);
         
         %Does it match? Must be: unused, not already on any ban lists for
         %this block
-        if not(used(iter) == 0)
+        if not(used(iterator(iter)) == 0)
             if not(ismember(testfit(2),MBanList)) && not(ismember(testfit(3), PBanList)) && not(ismember(testfit(4), ABanList)) 
-                found(end+1) = iter;
-                used(iter) = 0;
+                found(end+1) = iterator(iter);
+                used(iterator(iter)) = 0;
                 MBanList(1,end+1) = testfit(2);
                 PBanList(1,end+1) = testfit(3);
                 ABanList(1,end+1) = testfit(4);
@@ -277,10 +307,6 @@ for i=1:1
         wheretoput = (i-1)*24 + 16 + k; % 17:20 on iteration 1, 41:44 on iteration 2
         myblocks(wheretoput,:) = trial(:);
     end
-    
-    %MBanList
-    %PBanList
-    %ABanList
     
 
     
