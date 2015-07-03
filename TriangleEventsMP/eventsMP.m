@@ -28,13 +28,12 @@ black = 0;
 
 % get item order
 %stimFolder = '/Users/Shared/Experiments/ev/gestures/gestureStims_normalized/';
-stimFolder = [pwd '/gestureStims_normalized/'];
+stimFolder = [pwd '/movies/pilot/'];
 
-%[info moviefiles fname] = choose_order(subj,run,counter,stimFolder);
-fname = 'data/whooooogly.csv';
+[info moviefiles fname] = choose_order(subj,run,counter,stimFolder);
 
 %MKEdit
-moviefiles = struct('name', {'02_G_CG_Bee_2_NF.ogv','03_G_CG_Bee_3_NA.ogv'}, 'type',{'movie','movie'}, 'pahandle',{[], []});
+%moviefiles = struct('name', {'02_G_CG_Bee_2_NF.ogv','03_G_CG_Bee_3_NA.ogv'}, 'type',{'movie','movie'}, 'pahandle',{[], []});
 
 
 % save trial onset info
@@ -133,6 +132,8 @@ try
             
         elseif isequal(stim.type,'movie') % MOVIE TRIAL
             % load movie
+            stimFolder
+            stim.name
             [movie movieduration fps imgw imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
             
             % wait for onset of trial
@@ -230,6 +231,9 @@ catch % save onset times, show error
     % end timing
     fprintf('Experiment finished!');
     expEnd = GetSecs
+    
+    %debug
+    expStart = 2;
     
     fprintf('Total duration: ');
     total = expEnd - expStart
