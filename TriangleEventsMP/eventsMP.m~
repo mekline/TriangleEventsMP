@@ -6,9 +6,9 @@ function eventsMP(subj, run, counter)
 %of events in language and other regions.  It involves a series of simple
 %animated movies featuring a cartoon agent (A) moving along a path (P) with
 %some distinctive manner (M). Code for generating these movies can be found
-%at www.github.com/mekline/MannerPath
+%at www.github.com/mekline/MannerPath.
 %
-%The blocks/conditions) of interest involve different *sequences* of
+%The blocks/conditions of interest involve different *sequences* of
 %these movies that vary on some, all or none of these dimensions, plus a 
 %control condition with a still agent plus some low-level controls for
 %relative motion (made possible by having *all* movies drift around in a
@@ -25,6 +25,13 @@ function eventsMP(subj, run, counter)
 %but the items/block construction are randomly generated each time, so 
 %some repetition is possible. 
 %
+%Timing info: Each movie is 6.0 seconds long; movies should be presented
+%with a minimal gap (0.25?) between each. Movies are preloaded to prevent
+%overly bad buffering delays. Blocks are lumped into megablocks, with
+%fixation periods at the beginning, middle and end of the experiment
+%lasting for 16.0 seconds. Thus each run is 12*(4*6.25) + 3*(16.0) = 548
+%seconds = 5.8 minutes long (5 min 48 sec).
+%
 %Inputs: 
 %subj = subject id (string)
 %run = run # (int 1-5)
@@ -35,7 +42,7 @@ function eventsMP(subj, run, counter)
 %think of that one might care about for each trial.
 %
 %subj_items_run1_onsets.csv - the actual onsets of each trial and the
-%intended onsets of each trial (these should be very close). 
+%intended onsets of each trial (these should be very close to one another). 
 
 
 
@@ -69,27 +76,26 @@ end
 % constants
 num_of_trials = 48;
 num_of_fix = 3;
-trialDur = 7.0;
+trialDur = 6.25;
 fixDur = 16.0;
-black = 0;
+black = [0 0 0];
+white = [255 255 255];
 
 % get item order
-%stimFolder = '/Users/Shared/Experiments/ev/gestures/gestureStims_normalized/';
 stimFolder = [pwd '/movies/pilot/'];
-
 [info moviefiles fname] = choose_order(subj,run,counter,stimFolder);
 
-%MKEdit
-%moviefiles = struct('name', {'02_G_CG_Bee_2_NF.ogv','03_G_CG_Bee_3_NA.ogv'}, 'type',{'movie','movie'}, 'pahandle',{[], []});
+% save (intended/ideal) trial onset info, plus trial numbers to facilitate
+% merging data later...
+trial_types = cell(51,4);
+trial_types(1:51, 1) = {'trial'};
+trial_types([1 25 51],1) = {'fix'};
+CUTOFF = ones(48,1); %not sure what this is for yet
 
-
-% save trial onset info
-trial_types = cell(33,2);
-trial_types(:,1) = {' '};
-trial_types([1 17 33],1) = {'fix'};
-%trial_types([2:16 18:32],1) = info(:,8);
-CUTOFF = ones(30,1);
-
+% trial_types(1,1) = {'trialtype'};
+% trial_types(1,2) = {'measured_onset'};
+% trial_types(1,3) = {'intended_onset'};
+% trial_types(1,4) = {'trialnum'};
 
 
 % PTB setup
@@ -118,12 +124,21 @@ try
     vidSq = [X/2-480 Y/2-270 X/2+480 Y/2+270]; %vid dimensions
     fixPt = [[1 1 1 1]*X/2 + [0 0 -1 1]*20;
         [1 1 1 1]*Y/2 + [-1 1 0 0]*20];
+
+    % total trials
+    
+    %For debugging!!! A short experiment
+    info = info(:,1:8);
+    moviefiles = moviefiles(:,1:8);
+    fname = fname(1:8);    
+    echo on
+    moviecount = size(moviefiles,2)
+    echo off
+    
+    moviecount = size(moviefiles,2);
     
     % make video shader
     shader = CreateSinglePassImageProcessingShader(win, 'BackgroundMaskOut', [255 255 255]);
-    
-    % total trials
-    moviecount = size(moviefiles,2);
     
     % wait for trigger
     Screen('TextSize', win, 32);
@@ -140,10 +155,10 @@ try
     
     % timestamp experiment start
     fprintf('Experiment started!');
-    expStart = GetSecs
+    expStart = GetSecs;
     trial_types{1,2} = expStart;
     
-    % fixation block
+    % Show fixation block
     iteration = 0;
     
     Screen(win, 'DrawLines', fixPt,2,black);
@@ -153,93 +168,63 @@ try
         assert(~keyCode(KbName('ESCAPE')),'...ESCAPE to quit early')
     end
     
-    % update timing
-    t_perfect = expStart+fixDur-trialDur;
+    % Update intended timing in prep for the first trial...
+    t_perfect = expStart+fixDur-trialDur; %Starts this way so trialDur can be iterated each time to find next onset
     trial_types{1,3} = t_perfect;
+    
+    
     % trial loop
     while iteration<moviecount
         % get item info
         iteration = iteration + 1;
         stim = moviefiles(iteration);
-        trial_types{iteration+ceil(iteration/15),1} = stim.type;
+        trial_types{iteration+ceil(iteration/24),1} = stim.type; %This is some clever math that adds 1 to iteration when we haven't gotten to the middle fix and 2 after we have!
         Screen('Flip', win);
-        if isequal(stim.type,'audio') % AUDIO TRIAL
-            % start audio
-            PsychPortAudio('Start', stim.pahandle, 1, 0, 1);
-            
-            % wait for onset of trial
-            while GetSecs<t_perfect+trialDur
-                
-                [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
-                assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
-            end
-            
-            % update timing
-            t_perfect = t_perfect+trialDur;
-            trial_types{iteration+ceil(iteration/15),2} = GetSecs;
-            trial_types{iteration+ceil(iteration/15),3} = t_perfect;
-            
-            % play audio
-            playing = 1;
-            while playing
-                
-                [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
-                assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
-                status = PsychPortAudio('GetStatus', stim.pahandle);
-                if status.Active == 0 % close audio
-                    PsychPortAudio('Close', stim.pahandle);
-                    playing = 0;
+
+        % load movie
+        [movie movieduration fps imgw imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
+
+        % wait for intended onset of trial
+        while GetSecs<t_perfect+trialDur
+            [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
+            assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
+        end
+
+        % start movie
+        Screen('PlayMovie', movie, 1, 0, 1.0);
+
+        % update timing
+        t_perfect = t_perfect+trialDur;
+        trial_types{iteration+ceil(iteration/15),2} = GetSecs;
+        trial_types{iteration+ceil(iteration/15),3} = t_perfect;
+        trial_types{iteration+ceil(iteration/15),4} = iteration; %the current trial number!
+
+        % play movie
+        while GetSecs<t_perfect+trialDur %if we bump into the next movie's timeslot, maybe cut movie short?
+            [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
+            assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
+
+            if (imgw>0) && (imgh>0)
+                tex = Screen('GetMovieImage', win, movie, 0);
+                if tex < 0
                     CUTOFF(iteration,1) = 0;
+                    break;
                 end
-            end
-            
-        elseif isequal(stim.type,'movie') % MOVIE TRIAL
-            % load movie
-            stimFolder
-            stim.name
-            [movie movieduration fps imgw imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
-            
-            % wait for onset of trial
-            while GetSecs<t_perfect+trialDur
-                [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
-                assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
-            end
-            
-            % start movie
-            Screen('PlayMovie', movie, 1, 0, 1.0);
-            
-            % update timing
-            t_perfect = t_perfect+trialDur;
-            trial_types{iteration+ceil(iteration/15),2} = GetSecs;
-            trial_types{iteration+ceil(iteration/15),3} = t_perfect;
-            
-            % play movie
-            while GetSecs<t_perfect+trialDur %if lag: maybe cut movie short?
-                [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
-                assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
-                
-                if (imgw>0) && (imgh>0)
-                    tex = Screen('GetMovieImage', win, movie, 0);
-                    if tex < 0
-                        CUTOFF(iteration,1) = 0;
-                        break;
-                    end
-                    if tex == 0
-                        WaitSecs('YieldSecs', 0.005);
-                        continue;
-                    end
-                    Screen('DrawTexture', win, tex, [], [], [], [], [], [], shader);
-                    Screen('Flip', win);
-                    Screen('Close', tex);
-                end;
-                
+                if tex == 0
+                    WaitSecs('YieldSecs', 0.005);
+                    continue;
+                end
+                Screen('DrawTexture', win, tex, [], [], [], [], [], [], shader);
+                Screen('Flip', win);
+                Screen('Close', tex);
             end;
-            Screen('Flip', win);
-            Screen('PlayMovie', movie, 0); % stop movie
-            Screen('CloseMovie', movie); % close movie
+
         end;
-        
-        if mod(iteration,15)==0 % after trials 15, 30
+        Screen('Flip', win);
+        Screen('PlayMovie', movie, 0); % stop movie
+        Screen('CloseMovie', movie); % close movie
+
+        if mod(iteration,24)==0 % after trials 24, 48, do a fixation period!
             % wait for onset of fixation block
             
             while GetSecs<t_perfect+trialDur
@@ -296,7 +281,7 @@ catch % save onset times, show error
     expEnd = GetSecs
     
     %debug
-    expStart = 2;
+    %expStart = 2;
     
     fprintf('Total duration: ');
     total = expEnd - expStart
@@ -305,7 +290,7 @@ catch % save onset times, show error
     
     % save trial onsets
     onsetfile = [fname(1:end-4) '_onsets.csv'];
-    header = {'trial_type','onset','perfect'};
+    header = {'trial_type','measured_onset','perfect'};
 
     fid = fopen(onsetfile,'w');
     fprintf(fid,'%s,%s,%s\n',header{1,:});

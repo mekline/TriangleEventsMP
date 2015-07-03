@@ -1,4 +1,4 @@
-function [info stimFiles fname] = choose_order(subj,run,counter,stimFolder)
+function [info stimFiles fname] = choose_order(subj,run,counter)
 %create item presentation order for eventsMP
 %
 %items come from 4 sets: A, B (event items) C, & D (control items).  
@@ -511,16 +511,21 @@ blocknum = 1:48;
 blocknum = ceil(blocknum/4);
 info(:,7) = num2cell(blocknum);
 
+%And trial number too, why not!
+trialnum = 1:48;
+info(:,8) = num2cell(trialnum);
+
 fid = fopen(fname,'w');
 
 headers = raw(1,:);
 headers(end+1) = {'blocktype'};
 headers(end+1) = {'blocknum'};
+headers(end+1) = {'trialnum'};
 
 
-fprintf(fid,'%s,%s,%s,%s,%s,%s,%s\r\n',headers{:});
+fprintf(fid,'%s,%s,%s,%s,%s,%s,%s, %s\r\n',headers{:});
 for i = 1:48
-    fprintf(fid,'%s,%s,%s,%s,%s,%s,%d\r\n',info{i,:});
+    fprintf(fid,'%s,%s,%s,%s,%s,%s,%d, %d\r\n',info{i,:});
 end
 fclose('all');
 disp(['...item order saved as ',fname])
