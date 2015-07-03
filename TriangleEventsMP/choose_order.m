@@ -46,6 +46,7 @@ stimFiles=1;
 fname = 1;
 
 raw(:,4) = cellfun(@num2str, raw(:,4), 'UniformOutput', 0);
+raw(:,3) = cellfun(@num2str, raw(:,3), 'UniformOutput', 0);
 
 % extract items from the 4 sets into their own cellarrays
 
