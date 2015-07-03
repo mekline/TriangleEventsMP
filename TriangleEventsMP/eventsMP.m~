@@ -35,7 +35,7 @@ function eventsMP(subj, run, counter)
 %think of that one might care about for each trial.
 %
 %subj_items_run1_onsets.csv - the actual onsets of each trial and the
-%intended onsets of each trial (these should be very close to one another). 
+%intended onsets of each trial (these should be very close). 
 
 
 
