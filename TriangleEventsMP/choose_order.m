@@ -39,6 +39,7 @@ function [info stimFiles fname] = choose_order(subj,run,counter,stimFolder)
 % open materials file
 [num,txt,raw] = xlsread('materials.xls');
 
+
 %dummy output args, fix these up later!
 info=1;
 stimFiles=1;
@@ -49,13 +50,13 @@ raw(:,4) = cellfun(@num2str, raw(:,4), 'UniformOutput', 0);
 % extract items from the 4 sets into their own cellarrays
 
 all_n = length(raw);
-A = cell(64,7); %init A
-B = cell(64,7); %init B
-C = cell(16,7); %init C
-D = cell(16,7); %init D
+A = cell(64,5); %init A
+B = cell(64,5); %init B
+C = cell(16,5); %init C
+D = cell(16,5); %init D
 
 mysets = {A, B, C, D};
-mynames = ['A','B','C','D'];
+mynames = ['W','X','Y','Z'];
 for k=1:4
     j = 0;
     for i = 2:all_n
@@ -73,7 +74,7 @@ end
 %be both the fixed manner and the manner of the S block in a run.)  
 
 %Make a place to hold the rows of each block, plus block kind
-myblocks = cell(48,8);
+myblocks = cell(48,6);
 
 for i=1:2
     myset = mysets{i};  
@@ -100,9 +101,10 @@ for i=1:2
             j = datasample(used, 1);
             used(j) = 0;
             trial = myset(j,:);
-            trial{1,8} = 'S';
-            for k=((i-1)*24 + 1):((i-1)*24 + 4) % 1:4 on iteration 1, 25:28 on iteration 2
-                myblocks(k,:) = trial(:);
+            trial{1,6} = 'S';
+            for k=1:4 % 1:4 on iteration 1, 5-8 on iteration 2
+                wheretoput = 4*(i-1) + k;
+                myblocks(wheretoput,:) = trial(:);
             end
 
             %And save those manner & paths to prevent them from being used as a
@@ -168,8 +170,9 @@ for i=1:2
             %Add M block to myblocks
             for k=1:4 
                 trial = myset(found(k),:);
-                trial{1,8} = 'M';
-                wheretoput = (i-1)*24 + 4 + k; % 5:8 on iteration 1, 29:32 on iteration 2
+                trial{1,6} = 'M';
+                %wheretoput = (i-1)*24 + 4 + k; % 5:8 on iteration 1, 29:32 on iteration 2
+                wheretoput = 8 + 4*(i-1) + k; %9-12 on it1, 13-16 on it2
                 myblocks(wheretoput,:) = trial(:);
             end           
             %%
@@ -233,8 +236,8 @@ for i=1:2
             %Add P block to myblocks
             for k=1:4 
                 trial = myset(found(k),:);
-                trial{1,8} = 'P';
-                wheretoput = (i-1)*24 + 8 + k; % 9:12 on iteration 1, 33:36 on iteration 2
+                trial{1,6} = 'P';
+                wheretoput = 16 + 4*(i-1) + k; %17-20 on it1, 21-24 on it2
                 myblocks(wheretoput,:) = trial(:);
             end            
             %%
@@ -295,8 +298,8 @@ for i=1:2
             %Add A block to myblocks
             for k=1:4 
                 trial = myset(found(k),:);
-                trial{1,8} = 'A';
-                wheretoput = (i-1)*24 + 12 + k; % 13:16 on iteration 1, 37:40 on iteration 2
+                trial{1,6} = 'A';
+                wheretoput = 24 + 4*(i-1) + k; %25-28 on it1, 29-32 on it2
                 myblocks(wheretoput,:) = trial(:);
             end
             %%
@@ -351,8 +354,8 @@ for i=1:2
             %Add D block to myblocks
             for k=1:4 
                 trial = myset(found(k),:);
-                trial{1,8} = 'D';
-                wheretoput = (i-1)*24 + 16 + k; % 17:20 on iteration 1, 41:44 on iteration 2
+                trial{1,6} = 'D';
+                wheretoput = 32 + 4*(i-1) + k; %33-36 on it1, 37-40 on it2
                 myblocks(wheretoput,:) = trial(:);
             end
             %%
@@ -424,11 +427,10 @@ for i=1:2 % Same thing, for the control blocks!
         end
 
         %Add C block to myblocks
-        a='here'
         for k=1:4 
             trial = myset(found(k),:);
-            trial{1,8} = 'C';
-            wheretoput = (i-1)*24 + 20 + k; % 21:24 on iteration 1, 45:48 on iteration 2
+            trial{1,6} = 'C';
+            wheretoput = 40 + 4*(i-1) + k; %41-44 on it1, 45-48 on it2
             myblocks(wheretoput,:) = trial(:);
         end
         %%
@@ -441,8 +443,7 @@ end
 
 
 %Check what the block looks like during debug
-%myblocks(1:48, [2 3 4 8])
-myblocks(1:48, [2 3 4 5 8])
+%myblocks(1:48, 2:6);
 
 
 %Blocks/items for this subject are chosen! Now to put them in the block
@@ -459,64 +460,69 @@ opts = [1 2 3 4 5 6;
         5 6 1 2 3 4
         6 1 2 3 4 5]; %possible ordering of conds (A B C ...; B C D ...; etc.)
     
-
-c = ITEMS(opts(counter,:),:);  %block counterbalancing order
+%Which row order should we take? That's a combo of run + counterbalancing!  
+toUse = mod((run + counter), 6) + 1;
+c = ITEMS(opts(toUse,:),:);  %block counterbalancing order
 
 
 % place in final item order
-info = cell(48,8); %init order
-for i = 0:4
-    info([(1+ i*3):(3 + i*3) (28 - i*3):(30-i*3)],:) = A(c(i+1,:),:);
+info = cell(48,6); %init info 
+%Flip a coin! Which data subset goes first this run? (WWWWXXXXWWWW etc.)
+
+whichfirst = randi(2)-1;
+
+for i = 0:5
+    if mod(whichfirst+i,2) == 0
+        info([(1+ i*4):(4 + i*4) (45 - i*4):(48-i*4)],:) = myblocks(c(i+1,:),:); %This counts inward - eg i=0 chooses 1st 4 and last 4
+    else
+        info([(45 - i*4):(48-i*4) (1+ i*4):(4 + i*4)],:) = myblocks(c(i+1,:),:);
+    end
 end
 
-info
-% disp(['...item order created for subject ',subj,', run ',num2str(run)])
-% 
-% 
-% % load movie names, sound files
-% 
-% stimFiles = [];
-% for j = 1:30
-%     if isequal(info{j,8},'audio')
-%         
-%         stimFiles(end+1).type = 'audio';
-%         stimFiles(end).name = info{j,2};
-%         
-%         stimFolder
-%         stimFiles(end).name
-%         
-%         
-%         [y,freq] = audioread([stimFolder stimFiles(end).name]);
-%         wavedata = y';
-%         nrchannels = size(wavedata,1);
-%         pahandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
-%         PsychPortAudio('FillBuffer', pahandle, wavedata);
-%         stimFiles(end).pahandle = pahandle;
-%     else
-%         stimFiles(end+1).type = 'movie';
-%         stimFiles(end).name = info{j,2};
-%  
-%             
-%     end
-% end
-% 
-%         
-% 
-% % save item order, safe from over-write
-% fname = ['data/',subj,'_items_run',num2str(run),'.csv'];
-% x = 1;
-% while exist(fname)==2
-%     fname = ['data/',subj,'_items_run',num2str(run),'-x',num2str(x),'.csv'];
-%     x=x+1;
-% end
-% 
-% fid = fopen(fname,'w');
-% fprintf(fid,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n',raw{1,:});
-% for i = 1:30
-%     fprintf(fid,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d\n',info{i,:});
-% end
-% fclose('all');
-% disp(['...item order saved as ',fname])
-% 
-% end
-% 
+echo on
+disp(['...item order created for subject ',subj])
+disp(['subj counterbalancing ', num2str(counter), ', run ',num2str(run)])
+echo off
+
+
+
+% load movie names into a struct for easy access. (I dont' know, I guess
+% the main script wants it that way....)
+
+stimFiles = [];
+for j = 1:48
+    stimFiles(end+1).type = 'movie';
+    stimFiles(end).name = info{j,1};
+end
+
+        
+
+% save item order, safe from over-write
+fname = ['data/',subj,'_items_run',num2str(run),'.csv'];
+x = 1;
+while exist(fname)==2
+    fname = ['data/',subj,'_items_run',num2str(run),'-x',num2str(x),'.csv'];
+    x=x+1;
+end
+
+%Add block number to info in case we need it!
+blocknum = 1:48;
+blocknum = ceil(blocknum/4);
+info(:,7) = num2cell(blocknum);
+
+fid = fopen(fname,'w');
+
+headers = raw(1,:);
+headers(end+1) = {'blocktype'};
+headers(end+1) = {'blocknum'};
+
+
+fprintf(fid,'%s,%s,%s,%s,%s,%s,%s\r\n',headers{:});
+for i = 1:48
+    fprintf(fid,'%s,%s,%s,%s,%s,%s,%d\r\n',info{i,:});
+end
+fclose('all');
+disp(['...item order saved as ',fname])
+
+end
+
