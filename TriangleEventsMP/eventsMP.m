@@ -75,8 +75,8 @@ end
 
 % constants
 num_of_trials = 48;
-num_of_fix = 3;
-trialDur = 6.25;
+num_of_fix = 3.0;
+trialDur = 6.0;
 fixDur = 16.0;
 black = [0 0 0];
 white = [255 255 255];
@@ -91,11 +91,6 @@ trial_types = cell(51,4);
 trial_types(1:51, 1) = {'trial'};
 trial_types([1 25 51],1) = {'fix'};
 CUTOFF = ones(48,1); %not sure what this is for yet
-
-% trial_types(1,1) = {'trialtype'};
-% trial_types(1,2) = {'measured_onset'};
-% trial_types(1,3) = {'intended_onset'};
-% trial_types(1,4) = {'trialnum'};
 
 
 % PTB setup
@@ -116,7 +111,7 @@ try
     % open screen
     screen = max(Screen('Screens'));
     PsychImaging('PrepareConfiguration');
-    [win rect] = PsychImaging('OpenWindow', screen, [255 255 255], []);
+    [win rect] = PsychImaging('OpenWindow', screen, white, []);
     
     % useful screen coordinates
     X = rect(RectRight);
@@ -129,8 +124,7 @@ try
     
     %For debugging!!! A short experiment
     info = info(:,1:8);
-    moviefiles = moviefiles(:,1:8);
-    fname = fname(1:8);    
+    moviefiles = moviefiles(:,1:8);    
     echo on
     moviecount = size(moviefiles,2)
     echo off
@@ -252,19 +246,19 @@ try
     end;
     % end timing
     fprintf('Experiment finished!');
-    expEnd = GetSecs
+    expEnd = GetSecs;
     
     fprintf('Total duration: ');
     total = expEnd - expStart
 
     % save trial onsets
     onsetfile = [fname(1:end-4) '_onsets.csv'];
-    header = {'trial_type','onset'};
+    header = {'trial_type','measured_onset','perfect_onset', 'trialnum'};
 
     fid = fopen(onsetfile,'w');
-    fprintf(fid,'%s,%s\n',header{1,:});
-    for i = 1:33
-        fprintf(fid,'%s,%f,%f\n',trial_types{i,:});
+    fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
+    for i = 1:48
+        fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
     end
     
     % close all
@@ -277,7 +271,7 @@ try
     return;
 catch % save onset times, show error
     % end timing
-    fprintf('Experiment finished!');
+    fprintf('Experiment finished - Exited on error.');
     expEnd = GetSecs
     
     %debug
@@ -293,12 +287,9 @@ catch % save onset times, show error
     header = {'trial_type','measured_onset','perfect_onset', 'trialnum'};
 
     fid = fopen(onsetfile,'w');
-    fid
-    onsetfile
-    fprintf(fid,'%s,%s,%s\n',header{1,:});
-    for i = 1:33
-        fprintf(fid,'%s,%f,%f\n',trial_types{i,:});
-        'here'
+    fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
+    for i = 1:48
+        fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
     end
     
     % close all
