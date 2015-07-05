@@ -499,10 +499,10 @@ end
         
 
 % save item order, safe from over-write
-fname = ['data/',subj,'_items_run',num2str(run),'.csv'];
+fname = ['data/',subj,'_c', num2str(counter),'_items_run',num2str(run),'.csv'];
 x = 1;
 while exist(fname)==2
-    fname = ['data/',subj,'_items_run',num2str(run),'-x',num2str(x),'.csv'];
+    fname = ['data/',subj,'_c', num2str(counter),'_items_run',num2str(run),'-x',num2str(x),'.csv'];
     x=x+1;
 end
 

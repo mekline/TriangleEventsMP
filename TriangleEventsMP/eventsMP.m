@@ -23,10 +23,10 @@ function eventsMP(subj, run, counter)
 %should see 60 blocks; this is broken up into 5 runs of 12 blocks each.
 %Subsequent blocks for a subject are guaranteed to be ordered nicely,
 %but the items/block construction are randomly generated each time, so 
-%some repetition is possible. 
+%repetition of individual movies is possible/likely. 
 %
 %Timing info: Each movie is 6.0 seconds long; movies should be presented
-%with a minimal gap (0.25?) between each. Movies are preloaded to prevent
+%(???) with a small gap (0.25?) between each. Movies are preloaded to prevent
 %overly bad buffering delays. Blocks are lumped into megablocks, with
 %fixation periods at the beginning, middle and end of the experiment
 %lasting for 16.0 seconds. Thus each run is 12*(4*6.25) + 3*(16.0) = 548
@@ -50,28 +50,27 @@ function eventsMP(subj, run, counter)
 assert(ischar(subj) && run<6 &&counter<7, 'INCORRECT INPUTS -- subj: str (same as opt2), run: 1-5, counter: 1-6')
 
 
-file_to_save = [subj '_items_run' num2str(run) '_onsets.csv']; 
+file_to_save = [pwd '/data/' subj,'_c', num2str(counter),'_onsets_run',num2str(run),'.csv'];
 
 % Error message if data file already exists.
-if exist([pwd '/data/' file_to_save],'file');
+if exist(file_to_save,'file');
     
     error('myfuns:eventsMP:DataFileAlreadyExists', ...
         'The data file already exists for this subject/run!');
 end
 
+%TO ADD
 % The second & subseqent runs should have the same value of counter as the first
 % run for that subject, and the runs should go in order!
-% if run > 1,    
-%     if exist([DATA_DIR filesep 'kan_langloc_' subj_id '_fmri_run' num2str(1) '_data.mat'],'file'),        
-%         if subj_data.reversed ~= do_rev_order,            
-%             error('myfuns:kanwisher_langloc_2conds_main_fmri:CounterDoesntMatch',...
-%                 'You must use the same value of counter (counterbalancing) for all runs.');
-%         end        
-%     else        
-%         error('myfuns:kanwisher_langloc_2conds_main_fmri:Run1DoesntExist',...
-%             'Run 1 does not yet exist.');
-%     end   
-% end
+if run > 1,  
+    %Find out what my counterbalancing is supposed to be.
+    %And what the latest run was. 
+    %     if exist([DATA_DIR filesep 'kan_langloc_' subj_id '_fmri_run' num2str(1) '_data.mat'],'file'),        
+    %error('myfuns:kanwisher_langloc_2conds_main_fmri:Run1DoesntExist',...
+    %         'Run 1 does not yet exist.');
+    
+end
+
 
 % constants
 num_of_trials = 48;
@@ -81,7 +80,7 @@ fixDur = 16.0;
 black = [0 0 0];
 white = [255 255 255];
 
-% get item order
+% get item orders for this run
 stimFolder = [pwd '/movies/pilot/'];
 [info moviefiles fname] = choose_order(subj,run,counter);
 
@@ -119,19 +118,19 @@ try
     vidSq = [X/2-480 Y/2-270 X/2+480 Y/2+270]; %vid dimensions
     fixPt = [[1 1 1 1]*X/2 + [0 0 -1 1]*20;
         [1 1 1 1]*Y/2 + [-1 1 0 0]*20];
-
-    % total trials
     
     %For debugging!!! A short experiment
-    info = info(:,1:8);
-    moviefiles = moviefiles(:,1:8);    
-    echo on
-    moviecount = size(moviefiles,2)
-    echo off
+%     info = info(:,1:8);
+%     moviefiles = moviefiles(:,1:8);    
+%     echo on
+%     moviecount = size(moviefiles,2)
+%     echo off
     
+    % total trials
     moviecount = size(moviefiles,2);
     
-    % make video shader
+    % make video shader (mk is not sure what this is for but exp breaks
+    % without)
     shader = CreateSinglePassImageProcessingShader(win, 'BackgroundMaskOut', [255 255 255]);
     
     % wait for trigger
@@ -157,6 +156,18 @@ try
     
     Screen(win, 'DrawLines', fixPt,2,black);
     Screen(win, 'Flip', expStart);
+    
+    %Preload ALL the movies during fixation (note = this does not work!)
+    moviePtrs = cell(moviecount,5);
+    for i=1:moviecount
+        stim = moviefiles(i);
+        %[this.movie this.movieduration this.fps this.imgw this.imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
+        
+        moviePtrs(i,:) =  {Screen('OpenMovie', win, [stimFolder stim.name])};
+        
+    end
+    
+    %...and wait for the fixation period to finish out if time left
     while GetSecs < expStart+fixDur
         [keyIsDown,secs,keyCode] = KbCheck;
         assert(~keyCode(KbName('ESCAPE')),'...ESCAPE to quit early')
@@ -169,15 +180,21 @@ try
     
     % trial loop
     while iteration<moviecount
-        % get item info
+        % get item info for this iteration
         iteration = iteration + 1;
         stim = moviefiles(iteration);
         trial_types{iteration+ceil(iteration/24),1} = stim.type; %This is some clever math that adds 1 to iteration when we haven't gotten to the middle fix and 2 after we have!
+        
         Screen('Flip', win);
 
-        % load movie
-        [movie movieduration fps imgw imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
-
+        % Use preloaded movie (doesn't work!)
+        %myMov = moviePtrs(iteration,:);
+        %movie = myMov(1);
+        %imgw = myMov(4);
+        %imgh = myMov(5);
+        
+        [movie movieduration fps imgh imgw] = Screen('OpenMovie', win, [stimFolder stim.name]);
+        
         % wait for intended onset of trial
         while GetSecs<t_perfect+trialDur
             [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
@@ -228,8 +245,8 @@ try
             
             % update timing
             t_perfect = t_perfect+trialDur;           
-            trial_types{iteration+ceil(iteration/15)+1,2} = GetSecs;
-            trial_types{iteration+ceil(iteration/15)+1,3} = t_perfect;
+            trial_types{iteration+ceil(iteration/24)+1,2} = GetSecs;
+            trial_types{iteration+ceil(iteration/24)+1,3} = t_perfect;
             % update screen
             Screen(win, 'DrawLines', fixPt,2,black);
             Screen(win, 'Flip');
@@ -252,10 +269,9 @@ try
     total = expEnd - expStart
 
     % save trial onsets
-    onsetfile = [fname(1:end-4) '_onsets.csv'];
     header = {'trial_type','measured_onset','perfect_onset', 'trialnum'};
 
-    fid = fopen(onsetfile,'w');
+    fid = fopen(file_to_save,'w');
     fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
     for i = 1:48
         fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
@@ -283,10 +299,9 @@ catch % save onset times, show error
    
     
     % save trial onsets
-    onsetfile = [fname(1:end-4) '_onsets.csv'];
     header = {'trial_type','measured_onset','perfect_onset', 'trialnum'};
 
-    fid = fopen(onsetfile,'w');
+    fid = fopen(file_to_save,'w');
     fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
     for i = 1:48
         fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
