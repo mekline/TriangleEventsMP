@@ -1,49 +1,49 @@
-trial_type,measured_onset,perfect_onset,trialnum
-fix,88274.379871,88284.379871, 
-movie,88290.604581,88290.379871, 1
-movie,88296.604398,88296.379871, 2
-movie,88302.604374,88302.379871, 3
-movie,88308.608344,88308.379871, 4
-movie,88314.608883,88314.379871, 5
-movie,88320.629897,88320.379871, 6
-movie,88326.629549,88326.379871, 7
-movie,88332.554178,88332.379871, 8
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-fix,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
-trial,,, 
+trial_type,measured_onset,perfect_onset,trialnum,perfect-actual onset
+fix,88274.37987,88284.37987, ,10
+movie,88290.60458,88290.37987,1,-0.22471
+movie,88296.6044,88296.37987,2,-0.224527
+movie,88302.60437,88302.37987,3,-0.224503
+movie,88308.60834,88308.37987,4,-0.228473
+movie,88314.60888,88314.37987,5,-0.229012
+movie,88320.6299,88320.37987,6,-0.250026
+movie,88326.62955,88326.37987,7,-0.249678
+movie,88332.55418,88332.37987,8,-0.174307
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+fix,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
+trial,,, ,
