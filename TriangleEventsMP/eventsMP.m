@@ -47,7 +47,7 @@ function eventsMP(subj, run, counter)
 
 
 % check inputs and other things
-assert(ischar(subj) && run<6 &&counter<7, 'INCORRECT INPUTS -- subj: str (same as opt2), run: 1-5, counter: 1-6')
+assert(ischar(subj) && run<6 &&counter<7, 'INCORRECT INPUTS -- subj: str ID, run: 1-5, counter: 1-6')
 
 
 file_to_save = [pwd '/data/' subj,'_c', num2str(counter),'_onsets_run',num2str(run),'.csv'];
