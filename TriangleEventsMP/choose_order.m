@@ -492,7 +492,7 @@ echo off
 
 stimFiles = [];
 for j = 1:48
-    stimFiles(end+1).type = 'movie';
+    stimFiles(end+1).type = 'realTrial';
     stimFiles(end).name = info{j,1};
 end
 

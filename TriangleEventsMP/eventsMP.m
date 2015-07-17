@@ -30,7 +30,7 @@ function eventsMP(subj, run, counter)
 %overly bad buffering delays. Blocks are lumped into megablocks, with
 %fixation periods at the beginning, middle and end of the experiment
 %lasting for 16.0 seconds. Thus each run is 12*(4*6.25) + 3*(16.0) = 548
-%seconds = 5.8 minutes long (5 min 48 sec).
+%seconds = 5.8 minutes long (5 min 48 sec) = 274 TR.
 %
 %Inputs: 
 %subj = subject id (string)
@@ -85,10 +85,9 @@ stimFolder = [pwd '/movies/pilot/'];
 [info moviefiles fname] = choose_order(subj,run,counter);
 
 % save (intended/ideal) trial onset info, plus trial numbers to facilitate
-% merging data later...
-trial_types = cell(51,4);
-trial_types(1:51, 1) = {'trial'};
-trial_types([1 25 51],1) = {'fix'};
+trial_onsets = cell(51,4);
+trial_onsets(1:51, 1) = {'trial'};
+trial_onsets([1 26 51],1) = {'fix'};
 CUTOFF = ones(48,1); %not sure what this is for yet
 
 
@@ -119,7 +118,7 @@ try
     fixPt = [[1 1 1 1]*X/2 + [0 0 -1 1]*20;
         [1 1 1 1]*Y/2 + [-1 1 0 0]*20];
     
-    %For debugging!!! A short experiment
+    %For debugging!!! A very short experiment
 %     info = info(:,1:8);
 %     moviefiles = moviefiles(:,1:8);    
 %     echo on
@@ -149,21 +148,13 @@ try
     % timestamp experiment start
     fprintf('Experiment started!');
     expStart = GetSecs;
-    trial_types{1,2} = expStart;
+    trial_onsets{1,2} = expStart;
     
     % Show fixation block
     iteration = 0;
     
     Screen(win, 'DrawLines', fixPt,2,black);
     Screen(win, 'Flip', expStart);
-    
-    %Preload ALL the movies during fixation (note = this does not work!)
-%     moviePtrs = cell(moviecount,5);
-%     for i=1:moviecount
-%         stim = moviefiles(i);
-%         moviePtrs(i,:) =  {Screen('OpenMovie', win, [stimFolder stim.name])};
-%         
-%     end
     
     %...and wait for the fixation period to finish out if time left
     while GetSecs < expStart+fixDur
@@ -173,7 +164,7 @@ try
     
     % Update intended timing in prep for the first trial...
     t_perfect = expStart+fixDur-trialDur; %Starts this way so trialDur can be iterated each time to find next onset
-    trial_types{1,3} = t_perfect;
+    trial_onsets{1,3} = t_perfect;
     
     
     % trial loop
@@ -181,32 +172,27 @@ try
         % get item info for this iteration
         iteration = iteration + 1;
         stim = moviefiles(iteration);
-        trial_types{iteration+ceil(iteration/24),1} = stim.type; %This is some clever math that adds 1 to iteration when we haven't gotten to the middle fix and 2 after we have!
+        trial_onsets{iteration+ceil(iteration/24),1} = stim.type; %This is some clever math that adds 1 to iteration when we haven't gotten to the middle fix and 2 after we have!
         
         Screen('Flip', win);
-
-        % Use preloaded movie (doesn't work!)
-        %myMov = moviePtrs(iteration,:);
-        %movie = myMov(1);
-        %imgw = myMov(4);
-        %imgh = myMov(5);
         
+        stim.name %print out in the bg in case of breaks
         [movie movieduration fps imgh imgw] = Screen('OpenMovie', win, [stimFolder stim.name]);
         
-        % wait for intended onset of trial
+        % wait for intended onset time of trial
         while GetSecs<t_perfect+trialDur
-            [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
+            [keyIsDown,secs,keyCode]=KbCheck;
             assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
         end
 
         % start movie
         Screen('PlayMovie', movie, 1, 0, 1.0);
 
-        % update timing
+        % How long did that take to start? (update timing)
         t_perfect = t_perfect+trialDur;
-        trial_types{iteration+ceil(iteration/15),2} = GetSecs;
-        trial_types{iteration+ceil(iteration/15),3} = t_perfect;
-        trial_types{iteration+ceil(iteration/15),4} = iteration; %the current trial number!
+        trial_onsets{iteration+ceil(iteration/24),2} = GetSecs;
+        trial_onsets{iteration+ceil(iteration/24),3} = t_perfect;
+        trial_onsets{iteration+ceil(iteration/24),4} = iteration; %the current trial number!
 
         % play movie
         while GetSecs<t_perfect+trialDur %if we bump into the next movie's timeslot, maybe cut movie short?
@@ -235,7 +221,7 @@ try
 
         if mod(iteration,24)==0 % after trials 24, 48, do a fixation period!
             % wait for onset of fixation block
-            
+
             while GetSecs<t_perfect+trialDur
                 [keyIsDown,secs,keyCode]=KbCheck; %#ok<ASGLU>
                 assert(~(keyIsDown==1 && keyCode(esc)),'ESC: quit early');
@@ -243,8 +229,8 @@ try
             
             % update timing
             t_perfect = t_perfect+trialDur;           
-            trial_types{iteration+ceil(iteration/24)+1,2} = GetSecs;
-            trial_types{iteration+ceil(iteration/24)+1,3} = t_perfect;
+            trial_onsets{iteration+ceil(iteration/24)+1,2} = GetSecs;
+            trial_onsets{iteration+ceil(iteration/24)+1,3} = t_perfect;
             % update screen
             Screen(win, 'DrawLines', fixPt,2,black);
             Screen(win, 'Flip');
@@ -260,7 +246,7 @@ try
         
     end;
     % end timing
-    fprintf('Experiment finished!');
+    fprintf('Experiment finished successfully!');
     expEnd = GetSecs;
     
     fprintf('Total duration: ');
@@ -271,8 +257,8 @@ try
 
     fid = fopen(file_to_save,'w');
     fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
-    for i = 1:48
-        fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
+    for i = 1:51 %48 trials + 3 fix periods
+        fprintf(fid,'%s,%f,%f, %d\r\n',trial_onsets{i,:});
     end
     
     % close all
@@ -302,7 +288,7 @@ catch % save onset times, show error
     fid = fopen(file_to_save,'w');
     fprintf(fid,'%s,%s,%s,%s\r\n',header{1,:});
     for i = 1:48
-        fprintf(fid,'%s,%f,%f, %d\r\n',trial_types{i,:});
+        fprintf(fid,'%s,%f,%f, %d\r\n',trial_onsets{i,:});
     end
     
     % close all
