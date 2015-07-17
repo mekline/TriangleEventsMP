@@ -516,6 +516,8 @@ trialnum = 1:48;
 info(:,8) = num2cell(trialnum);
 
 fid = fopen(fname,'w');
+fid
+fname
 
 headers = raw(1,:);
 headers(end+1) = {'blocktype'};

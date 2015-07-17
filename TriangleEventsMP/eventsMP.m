@@ -158,14 +158,12 @@ try
     Screen(win, 'Flip', expStart);
     
     %Preload ALL the movies during fixation (note = this does not work!)
-    moviePtrs = cell(moviecount,5);
-    for i=1:moviecount
-        stim = moviefiles(i);
-        %[this.movie this.movieduration this.fps this.imgw this.imgh] = Screen('OpenMovie', win, [stimFolder stim.name]);
-        
-        moviePtrs(i,:) =  {Screen('OpenMovie', win, [stimFolder stim.name])};
-        
-    end
+%     moviePtrs = cell(moviecount,5);
+%     for i=1:moviecount
+%         stim = moviefiles(i);
+%         moviePtrs(i,:) =  {Screen('OpenMovie', win, [stimFolder stim.name])};
+%         
+%     end
     
     %...and wait for the fixation period to finish out if time left
     while GetSecs < expStart+fixDur
@@ -287,11 +285,11 @@ try
     return;
 catch % save onset times, show error
     % end timing
-    fprintf('Experiment finished - Exited on error.');
+    'Experiment finished - Exited on error.'
     expEnd = GetSecs
     
     %debug
-    %expStart = 2;
+    expStart = 2;
     
     fprintf('Total duration: ');
     total = expEnd - expStart
