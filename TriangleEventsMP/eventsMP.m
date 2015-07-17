@@ -1,4 +1,4 @@
-function eventsMP(subj, run, counter)
+function eventsMP(subj, counter, run)
 %Melissa Kline 7/2015
 %Main function for running eventsMP.  Based on the langloc/ gestures script mostly. 
 %
@@ -35,8 +35,8 @@ function eventsMP(subj, run, counter)
 %
 %Inputs: 
 %subj = subject id (string)
-%run = run # (int 1-5)
 %counter = counterbalancing assignment of this subject (int 1-6)
+%run = run # (int 1-5)
 %
 %On each run, outputs:
 %subj_items_run1.csv - the trials run this time, plus all the info I could
