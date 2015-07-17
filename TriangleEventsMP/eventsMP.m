@@ -6,7 +6,7 @@ function eventsMP(subj, run, counter)
 %of events in language and other regions.  It involves a series of simple
 %animated movies featuring a cartoon agent (A) moving along a path (P) with
 %some distinctive manner (M). Code for generating these movies can be found
-%at www.github.com/mekline/MannerPath.
+%at www.github.com/mekline/MannerPath/.
 %
 %The blocks/conditions of interest involve different *sequences* of
 %these movies that vary on some, all or none of these dimensions, plus a 
@@ -23,14 +23,15 @@ function eventsMP(subj, run, counter)
 %should see 60 blocks; this is broken up into 5 runs of 12 blocks each.
 %Subsequent blocks for a subject are guaranteed to be ordered nicely,
 %but the items/block construction are randomly generated each time, so 
-%repetition of individual movies is possible/likely. 
+%repetition of individual movies is possible/likely (but not on adjacent
+%blocks). 
 %
 %Timing info: Each movie is 6.0 seconds long; movies should be presented
-%(???) with a small gap (0.25?) between each. Movies are preloaded to prevent
+%with a small gap (0.5) between each. Movies are preloaded to prevent
 %overly bad buffering delays. Blocks are lumped into megablocks, with
 %fixation periods at the beginning, middle and end of the experiment
-%lasting for 16.0 seconds. Thus each run is 12*(4*6.25) + 3*(16.0) = 548
-%seconds = 5.8 minutes long (5 min 48 sec) = 274 TR.
+%lasting for 16.0 seconds. Thus each run is 12*(4*6.5) + 3*(16.0) = 360
+%seconds = 6 minutes long = 180 TR.
 %
 %Inputs: 
 %subj = subject id (string)
@@ -75,7 +76,7 @@ end
 % constants
 num_of_trials = 48;
 num_of_fix = 3.0;
-trialDur = 6.0;
+trialDur = 6.5; %Movies are 6sec long, add a .5 sec buffer
 fixDur = 16.0;
 black = [0 0 0];
 white = [255 255 255];
@@ -174,6 +175,8 @@ try
         stim = moviefiles(iteration);
         trial_onsets{iteration+ceil(iteration/24),1} = stim.type; %This is some clever math that adds 1 to iteration when we haven't gotten to the middle fix and 2 after we have!
         
+        %Make sure the screen is blank at the beginning of the trial
+        Screen('FillRect', win, white); % this blanks the screen
         Screen('Flip', win);
         
         stim.name %print out in the bg in case of breaks
