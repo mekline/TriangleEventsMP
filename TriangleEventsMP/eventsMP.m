@@ -61,9 +61,10 @@ if exist(file_to_save,'file');
 end
 
 %TO ADD
+% An error check:
 % The second & subseqent runs should have the same value of counter as the first
 % run for that subject, and the runs should go in order!
-if run > 1,  
+if run > 1 
     %Find out what my counterbalancing is supposed to be.
     %And what the latest run was. 
     %     if exist([DATA_DIR filesep 'kan_langloc_' subj_id '_fmri_run' num2str(1) '_data.mat'],'file'),        
@@ -82,7 +83,7 @@ black = [0 0 0];
 white = [255 255 255];
 
 % get item orders for this run
-stimFolder = [pwd '/movies/pilot/'];
+stimFolder = [pwd '/movies/'];
 [info moviefiles fname] = choose_order(subj,run,counter);
 
 % save (intended/ideal) trial onset info, plus trial numbers to facilitate
