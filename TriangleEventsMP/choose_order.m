@@ -462,7 +462,7 @@ opts = [1 2 3 4 5 6;
         6 1 2 3 4 5]; %possible ordering of conds (A B C ...; B C D ...; etc.)
     
 %Which row order should we take? That's a combo of run + counterbalancing!  
-toUse = mod((run + counter), 6) + 1;
+toUse = mod((run + counter), 6) - 1; %Updated 6/10/15 to initialize better: args (1,1) yield ordering #1 (= para file p1)
 c = ITEMS(opts(toUse,:),:);  %block counterbalancing order
 
 
