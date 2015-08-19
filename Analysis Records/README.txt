@@ -17,6 +17,8 @@ Details about which contrasts are being computed for each experiment can be foun
 
 NOTE that not all participants have all localizers from our session, either bc we didn’t run it (pilot subj  FED_20150720a_3T2) or bc they had the localizer on a previous visit. Right now I don’t know where we get contrast images from previous/other sessions so they’re easily findable.  
 
+NOTE: Idan also says something about registering runs from other sessions to the correct anatomical data.  Whaaaaat?
+
 GENERAL EXPERIMENT INFO/NOTES
 
 EventsMP should be run 5 times per participant
