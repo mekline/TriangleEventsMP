@@ -17,7 +17,7 @@ Details about which contrasts are being computed for each experiment can be foun
 
 NOTE that not all participants have all localizers from our session, either bc we didn’t run it (pilot subj FED_20150720a_3T2 doesn’t have bioloc for instance) or bc they had the localizer on a previous visit. Right now I don’t know where we get contrast images from previous/other sessions so they’re easily findable.  
 
-NOTE: Idan also says something about registering runs from other sessions to the correct anatomical data.  Whaaaaat?
+
 
 *****
 GENERAL EXPERIMENT INFO/NOTES
@@ -38,7 +38,7 @@ kanwisher_langloc_2conds_main_fmri_idan(‘subid’, 1, 0)
 kanwisher_langloc_2conds_main_fmri_idan(‘subid’, 2, 0)
 (final input can be 1 for counterbalancing; needs to be constant/subject)
 
-*MDLoc (2 runs)
+*MDLoc (2 runs, or 1 if running short on time)
 “In this experiment, you will see a 4x3 grid of squares on the screen. These squares will light up in blue (one or two at a time) in some order. Then you will be shown two grids side-by-side, each with a pattern of blue squares. Your task is to choose which pattern corresponds to the sequence you just saw. Press button 1 to choose the grid on the left and button 2 to choose the one on the right. You will be given feedback after every trial. It’s designed to be very difficult so don’t worry if you are getting some of them wrong, the important thing is to focus on doing the task and try as hard as you can.”
 
 Shared/ev/grid_MDloc/
@@ -57,7 +57,7 @@ eventsMP(‘subid’,1,4)
 eventsMP(‘subid’,1,5)
 (middle input can be 1-6 for counterbalancing; needs to be constant/subject)
 
-*Dyloc (4 runs)
+*Dyloc (4 runs (or 2))
 “XXXXXXXX CURRENTLY BROKEN ON FRANKLIN”
 “This experiment is made for kids, so it’s pretty fun. You’re just going to be seeing very short movies and animations of kids playing and things like that. Just try to stay alert and watch what’s happening.”
 
@@ -110,6 +110,9 @@ run_subject_Aug202012.sh -c Config_modelandcontrdef_EventsMPExp_20150812.cfg -I 
 
 
 
+******* RANDOM fMRI notes *******
+
+NOTE: Idan also says something about registering runs from other sessions to the correct anatomical data??  Nope, problem solved. You don’t have to re-register anything for same-subject-different-session scans, SO LONG AS YOU ARE SUBSEQUENTLY MAPPING EVERYTHING TO THE NORMALIZED SPACE 
 
 
 
