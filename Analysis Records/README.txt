@@ -97,8 +97,6 @@ Ran (in this session) EventsMP (5), DyLoc (4), MTLoc (2)
 Func runs: 9 11 13 15 17 19 21 23 25 27 29
 
 
-1st level analyses:
-
 Dyloc
 run_subject_Aug202012.sh -c Config_allsteps_EventsMPExp_20150812.cfg -I /mindhive/nklab/u/mekline/Desktop/EventsMP/Data/FED_20150720a_3T2/FED_20150720a_3T2_dicom -m DyLoc FED_20150720a_3T2
 
@@ -108,12 +106,82 @@ run_subject_Aug202012.sh -c Config_modelandcontrdef_EventsMPExp_20150812.cfg -I 
 EventsMP
 run_subject_Aug202012.sh -c Config_modelandcontrdef_EventsMPExp_20150812.cfg -I /mindhive/nklab/u/mekline/Desktop/EventsMP/Data/FED_20150720a_3T2/FED_20150720a_3T2_dicom -m EventsMP FED_20150720a_3T2
 
+BioLoc
+Nope!
+
+LangLoc
+(from a previous sessions, not yet sure how to incorporate)
+
+MDLoc
+(from a previous sessions, not yet sure how to incorporate)
+
+
++++++
+FED_20150820a_3T2
+ID: 322
+Ran (in this session) LangLoc(2), MDLoc(1), EventsMP (5), DyLoc (2), MTLoc (2), BioLoc(2)
+Func runs: 5 7 9 11 13 17 19 21 23 25 27 29 31 33
+
+
+DyLoc
+run_subject_Aug202012.sh -c Config_allsteps_EventsMPExp_20150812.cfg -I /mindhive/evlab/u/mekline/Desktop/EventsMP/Data/FED_20150820a_3T2/FED_20150820a_3T2_dicom -m DyLoc FED_20150820a_3T2
+
++++++
+FED_20150823_3T2
+ID: 323
+Ran (in this session) LangLoc(2), MDLoc(1), EventsMP (5), DyLoc (2), MTLoc (2), BioLoc(2)
+Func runs: 5 7 9 11 13 15 17 19 21 23 25 29 31 33
+
+
 
 
 ******* RANDOM fMRI notes *******
 
-NOTE: Idan also says something about registering runs from other sessions to the correct anatomical data??  Nope, problem solved. You don’t have to re-register anything for same-subject-different-session scans, SO LONG AS YOU ARE SUBSEQUENTLY MAPPING EVERYTHING TO THE NORMALIZED SPACE 
+NOTE: Idan also says something about registering runs from other sessions to the correct anatomical data??  Nope, problem solved. You don’t have to re-register anything for same-subject-different-session scans, SO LONG AS YOU ARE SUBSEQUENTLY MAPPING EVERYTHING TO THE NORMALIZED SPACE (sometimes Idan isn’t.)
 
 
+
+
+***** Run outputs, to calm the brain of mk
+
+
+FED_20150820a_3T2
+
+ser   ntp    seq name
+----  ----   --------
+  1:  128:   AAHScout_32ch
+  2:    4:   AAHScout_32ch_MPR
+  3:  176:   T1_MPRAGE_1iso
+  4:  176:   T1_MPRAGE_1iso
+  5:  179:   ge_func_2p1x2p1x4_PACE_improved
+  6:  179:   MoCoSeries
+  7:  179:   ge_func_2p1x2p1x4_PACE_improved
+  8:  179:   MoCoSeries
+  9:  180:   ge_func_2p1x2p1x4_PACE_improved
+ 10:  180:   MoCoSeries
+ 11:  180:   ge_func_2p1x2p1x4_PACE_improved
+ 12:  180:   MoCoSeries
+ 13:  224:   ge_func_2p1x2p1x4_PACE_improved
+ 14:  224:   MoCoSeries
+ 15:    9:   ge_func_2p1x2p1x4_PACE_improved
+ 16:    9:   MoCoSeries
+ 17:  137:   ge_func_2p1x2p1x4_PACE_improved
+ 18:  137:   MoCoSeries
+ 19:  180:   ge_func_2p1x2p1x4_PACE_improved
+ 20:  180:   MoCoSeries
+ 21:  117:   ge_func_2p1x2p1x4_PACE_improved
+ 22:  117:   MoCoSeries
+ 23:  117:   ge_func_2p1x2p1x4_PACE_improved
+ 24:  117:   MoCoSeries
+ 25:  149:   ge_func_2p1x2p1x4_PACE_improved
+ 26:  149:   MoCoSeries
+ 27:  180:   ge_func_2p1x2p1x4_PACE_improved
+ 28:  180:   MoCoSeries
+ 29:  137:   ge_func_2p1x2p1x4_PACE_improved
+ 30:  137:   MoCoSeries
+ 31:  180:   ge_func_2p1x2p1x4_PACE_improved
+ 32:  180:   MoCoSeries
+ 33:  149:   ge_func_2p1x2p1x4_PACE_improved
+ 34:  149:   MoCoSeries
 
 
