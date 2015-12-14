@@ -1,4 +1,4 @@
-function [info stimFiles fname] = choose_order(subj,run,counter)
+function [info stimFiles fname] = choose_order(subj,counter, run)
 %create item presentation order for eventsMP
 %
 %items come from 4 sets: A, B (event items) C, & D (control items).  

@@ -84,7 +84,7 @@ white = [255 255 255];
 
 % get item orders for this run
 stimFolder = [pwd '/movies/'];
-[info moviefiles fname] = choose_order(subj,run,counter);
+[info moviefiles fname] = choose_order(subj, counter, run);
 
 % save (intended/ideal) trial onset info, plus trial numbers to facilitate
 trial_onsets = cell(51,4);
