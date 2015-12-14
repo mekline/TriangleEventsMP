@@ -1,6 +1,11 @@
 function [info stimFiles fname] = choose_order(subj,counter, run)
 %create item presentation order for eventsMP
 %
+%Each participant sees 5 runs, each in a counterbalanced order. We provide
+%6 counterbalancing conditions which alter the orderings of the runs.
+%
+%SO: Counter can be 1:6, and run can be 1:5
+%
 %items come from 4 sets: A, B (event items) C, & D (control items).  
 %
 %The goal is to randomly create blocks of the right kind (see below) and assemble
@@ -35,12 +40,15 @@ function [info stimFiles fname] = choose_order(subj,counter, run)
 %   sufficiently random by initial item division?)
 %   saves final run order in data/, safe from over-write
 
+%Check inputs
+assert(ischar(subj) &&counter<7 && run<6 , 'INCORRECT INPUTS -- subj: str ID, run: 1-5, counter: 1-6')
+
 
 % open materials file
 [num,txt,raw] = xlsread('materials.xls');
 
 
-%dummy output args, fix these up later!
+%dummy output args, we'll assign these up later!
 info=1;
 stimFiles=1;
 fname = 1;
@@ -51,10 +59,10 @@ raw(:,3) = cellfun(@num2str, raw(:,3), 'UniformOutput', 0);
 % extract items from the 4 sets into their own cellarrays
 
 all_n = length(raw);
-A = cell(64,5); %init A
-B = cell(64,5); %init B
-C = cell(16,5); %init C
-D = cell(16,5); %init D
+A = cell(64,5); %init A (frst set of real events)
+B = cell(64,5); %init B (2nd set of real events)
+C = cell(16,5); %init C (first set of control events)
+D = cell(16,5); %init D (second set of control events)
 
 mysets = {A, B, C, D};
 mynames = ['W','X','Y','Z'];
@@ -72,11 +80,11 @@ end
 %Draw items for each blocktype (in subsets A and B)!  These are done non-independently: 
 %within a single run, we'll assert that any indiv video is seen only once,
 %and no dimensions of generalization will be repeated (e.g. 'rotate' can't
-%be both the fixed manner and the manner of the S block in a run.)  
+%be both the fixed manner in the M block and the manner of the S block in a run.)  
 
 %Make a place to hold the rows of each block, plus block kind
 myblocks = cell(48,6);
-
+%Pick movies for the 'real event' blocks
 for i=1:2
     myset = mysets{i};  
     
@@ -90,7 +98,7 @@ for i=1:2
     
     while stillLooking
         
-            used = 1:64; %64 available 'real' event movies/subset, used 
+            used = 1:64; %64 available 'real' event movies in either A or B subset, used 
             %for indexing into the arrays.  Set to 0 when used.
             
             %%%%%
@@ -141,7 +149,8 @@ for i=1:2
             ABanList = trial(4);
             found = j;
 
-            %Extra bit so search through the subset won't always start at 1
+            %Extra bit so search through the subset won't always start at
+            %1/produce same orderings every time.
             iterator = [1:64]; 
             r = randi([1 64]);%shift!
             iterator = iterator([r:64 1:r]);
@@ -244,7 +253,7 @@ for i=1:2
             %%
                       
             %%%%%%%
-            %Make an A (agent-same) block
+            %Make an A (agent-same) block, more ugly repeated code)
             %%%%%%%
             %%
 
@@ -443,17 +452,19 @@ end
 
 
 
-%Check what the block looks like during debug
-%myblocks(1:48, 2:6);
+%Check what the blocks look like (debug).  Myblocks holds the moivename, agent,
+%manner, path of each movie, plus the block type (SMPA) and set (WX) it
+%belongs to.
+%myblocks
 
 
-%Blocks/items for this subject are chosen! Now to put them in the block
+%Blocks/items for this subject have been chosen! Now to put them in the block
 %order specified by the run + counterbalance scheme.  NOTE: as planned, 
 %each participant will see 5 runs, for a total of 10 blocks per condition.
 %There are 6 orderings of the stims below, so each person will miss one;
 %counterbalancing should be set at 1-6. 
 
-ITEMS = [1:8; 9:16; 17:24; 25:32; 33:40; 41:48]; %S;M;P;A;D;C
+ITEMS = [1:8; 9:16; 17:24; 25:32; 33:40; 41:48]; %S;M;P;A;D;C as listed in the myblocks array produced above
 opts = [1 2 3 4 5 6; 
         2 3 4 5 6 1;
         3 4 5 6 1 2;
@@ -462,16 +473,21 @@ opts = [1 2 3 4 5 6;
         6 1 2 3 4 5]; %possible ordering of conds (A B C ...; B C D ...; etc.)
     
 %Which row order should we take? That's a combo of run + counterbalancing!  
-toUse = mod((run + counter), 6) - 1; %Updated 6/10/15 to initialize better: args (1,1) yield ordering #1 (= para file p1)
+toUse = mod((run + counter)-2, 6) + 1; %Updated 12/14/15 to initialize better: args (1,1) yield ordering #1 (= para file p1)
+%NOTE: toUSE gives the Para file we will use, record this!!
+
 c = ITEMS(opts(toUse,:),:);  %block counterbalancing order
 
+%Array c has the items in the intended block order (e.g. SMPA, ASMP, etc.),
+%lumping the 2 blocks of each together (W, X sets).  Now to take them apart
+%into the real order to display!
 
-% place in final item order
+% This next part randomly picks the
+% W vs. X sets, and fleshes out the full order presented (e.g. SMPADC ->
+% SMPADCCDAPMS)
 info = cell(48,6); %init info 
 %Flip a coin! Which data subset goes first this run? (WWWWXXXXWWWW etc.)
-
 whichfirst = randi(2)-1;
-
 for i = 0:5
     if mod(whichfirst+i,2) == 0
         info([(1+ i*4):(4 + i*4) (45 - i*4):(48-i*4)],:) = myblocks(c(i+1,:),:); %This counts inward - eg i=0 chooses 1st 4 and last 4
@@ -479,6 +495,7 @@ for i = 0:5
         info([(45 - i*4):(48-i*4) (1+ i*4):(4 + i*4)],:) = myblocks(c(i+1,:),:);
     end
 end
+
 
 echo on
 disp(['...item order created for subject ',subj])
@@ -499,7 +516,7 @@ end
         
 
 % save item order, safe from over-write
-fname = ['data/',subj,'_c', num2str(counter),'_items_run',num2str(run),'.csv'];
+fname = ['data/',subj,'_items_c', num2str(counter),'_run',num2str(run), '_parafile', num2str(toUse),'.csv'];
 x = 1;
 while exist(fname)==2
     fname = ['data/',subj,'_c', num2str(counter),'_items_run',num2str(run),'-x',num2str(x),'.csv'];
@@ -516,8 +533,6 @@ trialnum = 1:48;
 info(:,8) = num2cell(trialnum);
 
 fid = fopen(fname,'w');
-fid
-fname
 
 headers = raw(1,:);
 headers(end+1) = {'blocktype'};

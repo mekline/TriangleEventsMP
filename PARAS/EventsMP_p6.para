@@ -1,0 +1,22 @@
+#onsets
+8 6
+21 1
+34 2
+47 3
+60 4
+73 5
+
+94 5
+107 4
+120 3
+133 2
+156 1
+159 6
+
+
+#names
+SameAll SameMan SamePath SameAg DiffAll Cont
+
+#durations
+13 13 13 13 13 13
+
