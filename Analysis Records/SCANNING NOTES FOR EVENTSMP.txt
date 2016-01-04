@@ -1,0 +1,99 @@
+SCANNING NOTES FOR EVENTSMP
+
+We can run on just Franklin now (hooray!)
+
+EventsMP wants the following experiments/localizers
+
+EventsMP - critical experiment
+DyLoc - scenes, faces, objects, bodies, fixation
+LangLoc - almighty langloc!
+MDLoc - standard multiple demand (aka spatialFIN)
+MTLoc - A low-level motion/drift task
+BioLoc - Biological dot motion vs. geo shape dot motion
+
+For each exp, we need to know:
+
+Location (on Franklin, it’s not exactly parallel on all testing comps)
+How many times to run it?
+Command + parameters
+Instructions for the participant.
+
+
+***
+***
+***
+EventsMP - 5 (6 minutes each)
+Folder:
+
+Command:Matlab eventsMP(‘subid’,1,1)
+
+Counterbalancing: First parameter fixed/subject (1-5), second changes. So e.g.
+eventsMP(‘subid’,2,2)
+eventsMP(‘subid’,2,3)
+eventsMP(‘subid’,2,4)
+
+“In this task you’ll be watching short animations of characters moving around. There’s no task in this one, just focus on paying attention to what’s happening and try to stay alert.”
+
+***
+***
+***
+DyLoc - 3 or 4 (4 minutes each)
+Folder:
+
+Command: Matlab dyLocX(‘subid’,[1:6],1,1)
+
+Counterbalancing: Middle vector needs number 1-6 in a random order, fixed by participant. Last two should be (1,1), (2,2), (3,3), or (4,4)
+
+“This experiment is made for kids, so it’s pretty fun. You’re just going to be seeing very short movies and animations of kids playing and things like that. Just try to stay alert and watch what’s happening.”
+
+***
+***
+***
+LangLoc - 2 (6 minutes each)
+Folder:
+
+Command: Matlab kanwisher_langloc_2conds_main_fmri_idan(‘subid’, 1, 0)
+
+Counterbalancing:
+Last 2 parameters should be either (1,0) and (2,0) or (1,1) and (2,1)
+
+“You’ll see series of sentences, and nonwords like jabberwocky. Your job is just to pay attention and read the words you see, and don’t be too stressed out if the words seem to go by quickly. At the end of each sentence you’ll see a picture of a hand pressing a button, and you should press button number 1 each time, this is just to help you stay alert.”  
+
+***
+***
+***
+MDLoc - 1 or 2 (7.5 minutes each)
+Folder:
+
+Command: python gridEXP.py -s subid -v4 -fy -n1 -c1
+
+Counterbalancing:(-n1 -c1) and (-n2 -c2)
+
+“In this experiment, you will see a 4x3 grid of squares on the screen. These squares will light up in blue (one or two at a time) in some order. Then you will be shown two grids side-by-side, each with a pattern of blue squares. Your task is to choose which pattern corresponds to the sequence you just saw. Press button 1 to choose the grid on the left and button 2 to choose the one on the right. You will be given feedback after every trial. It’s designed to be very difficult so don’t worry if you are getting some of them wrong, the important thing is to focus on doing the task and try as hard as you can.”
+
+***
+***
+***
+MTLoc - 2 (4.5 minutes each)
+Folder: Shared/ev/evMTLoc/
+
+Command: Matlab MTLoc_ev(‘subid’,1)
+
+Counterbalancing: Last parameter is 1 or 2
+
+“This is a lower-level vision test, so you’re going to be seeing just dots or static moving around. There will be some instructions on the screen to start that explains it a little more, but your task is just to press button number 1 whenever the red dot fades.”
+
+***
+***
+***
+BioLoc - 2 (5 minutes each)
+Folder: Shared/ev/BioLoc
+
+Command: Matlab bioloc2_evlab(‘subid’,[1:4],1,23452345)
+
+Counterbalancing:Vector is number 1-4 in some order; middle is the run number 1 2 3 or 4; final is a random seed that should be fixed for a participant.
+
+“In this experiment you’re going to be seeing point-light animations of people and objects - so it’s just white dots, but the motion will make you think of more specific things & actions.  There’s a memory task for this one: every once in a while an animation will repeat, and whenever this happens you should press button #1. So for instance if you see the one that looks like a person hitting a baseball bat twice in a row, hit the button. Otherwise just watch the movies and pay attention to what’s happening.”
+
+
+
