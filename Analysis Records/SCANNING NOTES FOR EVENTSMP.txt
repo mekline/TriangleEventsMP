@@ -11,13 +11,7 @@ MDLoc - standard multiple demand (aka spatialFIN)
 MTLoc - A low-level motion/drift task
 BioLoc - Biological dot motion vs. geo shape dot motion
 
-For each exp, we need to know:
-
-Location (on Franklin, it’s not exactly parallel on all testing comps)
-How many times to run it?
-Command + parameters
-Instructions for the participant.
-
+Below is deprecated, we have a wiki now!!
 
 ***
 ***
