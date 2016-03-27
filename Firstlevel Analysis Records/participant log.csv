@@ -6,7 +6,7 @@ FED_20150823_3T2,323,3,6 7 11 12 13,3 4,5,1 2,8 10,9 14,5 7 9 11 13 15 17 19 21 
 FED_20151118a_3T1,211,4,1 2 5 6 9,prev,prev,prev,3 4,7 8,10 12  21 25 27 29 31 33 35 ,Ha ha ha disaster session,x,y,y,y,y,y,y,,y,y,y,y,
 FED_20151119a_3T1,333,5,4 5 8 13 14,1 2,3,11 12,6 7,9 10,6 8 10 12 14 18 20 22 24 26 28 30 34 36,,x,y,y,y,y,y,y,,y,y,y,y,
 FED_20151120b_3T1,189,6,1 2 5 8 9,prev,prev,prev,3 6,4 7,6 8 10 12 14 16 18 20 22,,x,y,y,y,y,y,broke,,y,y,y,y,
-FED_20160105a_3T2,168,7,1 2 6 7 9,prev,prev,prev,3 8,4 5 MADE THIS BIOLOC.cat,5 7 9 11 13 15 17 19 21,"*If you can't find the dicoms, it might be under FED_201605 instead (month missing)",x,,y,y,y,,,*This Ss 1st level analyses are all borked,,,,,
+FED_20160105a_3T2,168,7,1 2 6 7 9,prev,prev,prev,3 8,4 5 MADE THIS BIOLOC.cat,5 7 9 11 13 15 17 19 21,"*If you can't find the dicoms, it might be under FED_201605 instead (month missing)",x,broke,y,y,y,broke,broke,*This Ss 1st level analyses are all borked,,,,,
 FED_20160105b_3T2,207,8,2 3 7 8 12,prev,prev,1 9 10 15,4 5,6 11,5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35,Scans at 29 31 35 are for Nhood,x,y,y,y,y,y,y,,,,,,
 FED_20160105c_3T2,342,9,6 7 9,3 5,4,1,NA,2 8,5 7 9 11 13 15 17 19 21,Scan had a lot of problems & late start; data might not be usable (missing intended func runs),x,EXCLUDE,EXCLUDE,EXCLUDE,EXCLUDE,EXCLUDE,EXCLUDE,,,,,,
 FED_20160105d_3T2,338,10,1 5 6 10 11,prev,prev,2 7 8 14,3 9,4 15,5 7 9 11 13 15 17 19 21 23 25 27 29 31 33,"Scans at 27 29 33 are for Nhood  NOTE: condition not recorded for 4th Dyloc, so I dropped run 14",x,y,y,y,y,y,y,,,,,,
