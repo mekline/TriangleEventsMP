@@ -109,6 +109,7 @@ RestrictKeysForKbCheck([esc trig1 trig2]);
 try
     
     % open screen
+    Screen('Preference', 'SkipSyncTests', 1);
     screen = max(Screen('Screens'));
     PsychImaging('PrepareConfiguration');
     [win rect] = PsychImaging('OpenWindow', screen, white, []);
